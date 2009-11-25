@@ -288,7 +288,7 @@ Date:   Tue Jan 2 17:49:17 2007 -0800
     <https://bugs.freedesktop.org/show_bug.cgi?id=9514>
 
 commit 75f83503ba1db628137ffc9d1d9e4f2a7a2fd97a
-Merge: 2f201b1... 153264a...
+Merge: 2f201b1 153264a
 Author: Jeremy C. Reed <reed@glacier.reedmedia.net>
 Date:   Sat Dec 9 09:31:02 2006 -0600
 
