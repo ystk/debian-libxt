@@ -1,3 +1,9 @@
+libxt (1:1.0.7-1+squeeze1) oldstable-security; urgency=low
+
+  * CVE-2013-2002 CVE-2013-2005
+
+ -- Moritz Muehlenhoff <jmm@debian.org>  Thu, 14 May 2013 19:41:49 +0000
+
 libxt (1:1.0.7-1) unstable; urgency=low
 
   [ Timo Aaltonen ]
