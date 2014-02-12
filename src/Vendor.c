@@ -1,5 +1,3 @@
-/* $Xorg: Vendor.c,v 1.4 2001/02/09 02:03:59 xorgcvs Exp $ */
-
 /***********************************************************
 
 Copyright 1987, 1988, 1998  The Open Group
@@ -29,13 +27,13 @@ Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -46,7 +44,6 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************/
-/* $XFree86: xc/lib/Xt/Vendor.c,v 1.7 2002/05/31 18:45:46 dawes Exp $ */
 
 /* Make sure all wm properties can make it out of the resource manager */
 
@@ -113,7 +110,7 @@ externaldef(vendorshellclassrec) VendorShellClassRec vendorShellClassRec = {
     /* class_part_initialize*/	NULL,
     /* Class init'ed ?    */	FALSE,
     /* initialize         */    NULL,
-    /* initialize_notify    */	NULL,		
+    /* initialize_notify    */	NULL,
     /* realize            */    XtInheritRealize,
     /* actions            */    NULL,
     /* num_actions        */    0,
@@ -128,8 +125,8 @@ externaldef(vendorshellclassrec) VendorShellClassRec vendorShellClassRec = {
     /* resize             */    XtInheritResize,
     /* expose             */    NULL,
     /* set_values         */    NULL,
-    /* set_values_hook      */	NULL,			
-    /* set_values_almost    */	XtInheritSetValuesAlmost,  
+    /* set_values_hook      */	NULL,
+    /* set_values_almost    */	XtInheritSetValuesAlmost,
     /* get_values_hook      */	NULL,
     /* accept_focus       */    NULL,
     /* intrinsics version */	XtVersion,

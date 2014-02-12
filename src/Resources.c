@@ -1,18 +1,36 @@
-/* $Xorg: Resources.c,v 1.4 2001/02/09 02:03:56 xorgcvs Exp $ */
-
 /***********************************************************
-Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts,
-Copyright 1993 by Sun Microsystems, Inc. Mountain View, CA.
+Copyright (c) 1993, Oracle and/or its affiliates. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next
+paragraph) shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
-supporting documentation, and that the names of Digital or Sun not be
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -21,15 +39,6 @@ ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
 WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
-
-SUN DISCLAIMS ALL WARRANTIES WITH REGARD TO  THIS  SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FIT-
-NESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL SUN BE  LI-
-ABLE  FOR  ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
-ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,  DATA  OR
-PROFITS,  WHETHER  IN  AN  ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION  WITH
-THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ******************************************************************/
 
@@ -58,8 +67,6 @@ used in advertising or otherwise to promote the sale, use or other dealings
 in this Software without prior written authorization from The Open Group.
 
 */
-
-/* $XFree86: xc/lib/Xt/Resources.c,v 1.11tsi Exp $ */
 
 /*LINTLIBRARY*/
 #ifdef HAVE_CONFIG_H
@@ -102,92 +109,6 @@ void _XtCopyFromParent(
 } /* _XtCopyFromParent */
 
 
-/* If the alignment characteristics of your machine are right, these may be
-   faster */
-
-#ifdef UNALIGNED
-
-void _XtCopyFromArg(
-    XtArgVal src,
-    char* dst,
-    register unsigned int size)
-{
-    if	    (size == sizeof(long))	*(long *)dst = (long)src;
-    else if (size == sizeof(short))	*(short *)dst = (short)src;
-    else if (size == sizeof(char))	*(char *)dst = (char)src;
-    else if (size == sizeof(XtPointer))	*(XtPointer *)dst = (XtPointer)src;
-    else if (size == sizeof(char*))	*(char **)dst = (char*)src;
-    else if (size == sizeof(XtArgVal))	*(XtArgVal *)dst = src;
-    else if (size > sizeof(XtArgVal))
-	(void) memmove((char *) dst, (char *)  src, (int) size);
-    else
-	(void) memmove((char *) dst, (char *) &src, (int) size);
-} /* _XtCopyFromArg */
-
-void _XtCopyToArg(
-    char* src,
-    XtArgVal *dst,
-    register unsigned int size)
-{
-    if (! (*dst)) {
-#ifdef GETVALUES_BUG
-	/* old GetValues semantics (storing directly into arglists) are bad,
-	 * but preserve for compatibility as long as arglist contains NULL.
-	 */
-        if	(size == sizeof(long))	   *dst = (XtArgVal)*(long*)src;
-	else if (size == sizeof(short))    *dst = (XtArgVal)*(short*)src;
-	else if (size == sizeof(char))	   *dst = (XtArgVal)*(char*)src;
-	else if (size == sizeof(XtPointer)) *dst = (XtArgVal)*(XtPointer*)src;
-	else if (size == sizeof(char*))    *dst = (XtArgVal)*(char**)src;
-	else if (size == sizeof(XtArgVal)) *dst = *(XtArgVal*)src;
-	else (void) memmove((char*)dst, (char*)src, (int)size);
-#else
-	XtErrorMsg("invalidGetValues", "xtGetValues", XtCXtToolkitError,
-	    "NULL ArgVal in XtGetValues", (String*) NULL, (Cardinal*) NULL);
-#endif
-    }
-    else {
-	/* proper GetValues semantics: argval is pointer to destination */
-	if	(size == sizeof(long))	   *((long*)*dst) = *(long*)src;
-	else if (size == sizeof(short))    *((short*)*dst) = *(short*)src;
-	else if (size == sizeof(char))	   *((char*)*dst) = *(char*)src;
-	else if (size == sizeof(XtPointer)) *((XtPointer*)*dst) = *(XtPointer*)src;
-	else if (size == sizeof(char*))    *((char**)*dst) = *(char**)src;
-	else if (size == sizeof(XtArgVal)) *((XtArgVal*)*dst)= *(XtArgVal*)src;
-	else (void) memmove((char*)*dst, (char*)src, (int)size);
-    }
-} /* _XtCopyToArg */
-
-static void CopyToArg(
-    char* src,
-    XtArgVal *dst,
-    register unsigned int size)
-{
-    if (! (*dst)) {
-	/* old GetValues semantics (storing directly into arglists) are bad,
-	 * but preserve for compatibility as long as arglist contains NULL.
-	 */
-        if	(size == sizeof(long))	   *dst = (XtArgVal)*(long*)src;
-	else if (size == sizeof(short))    *dst = (XtArgVal)*(short*)src;
-	else if (size == sizeof(char))	   *dst = (XtArgVal)*(char*)src;
-	else if (size == sizeof(XtPointer)) *dst = (XtArgVal)*(XtPointer*)src;
-	else if (size == sizeof(char*))    *dst = (XtArgVal)*(char**)src;
-	else if (size == sizeof(XtArgVal)) *dst = *(XtArgVal*)src;
-	else (void) memmove((char*)dst, (char*)src, (int)size);
-    }
-    else {
-	/* proper GetValues semantics: argval is pointer to destination */
-	if	(size == sizeof(long))	   *((long*)*dst) = *(long*)src;
-	else if (size == sizeof(short))    *((short*)*dst) = *(short*)src;
-	else if (size == sizeof(char))	   *((char*)*dst) = *(char*)src;
-	else if (size == sizeof(XtPointer)) *((XtPointer*)*dst) = *(XtPointer*)src;
-	else if (size == sizeof(char*))    *((char**)*dst) = *(char**)src;
-	else if (size == sizeof(XtArgVal)) *((XtArgVal*)*dst)= *(XtArgVal*)src;
-	else (void) memmove((char*)*dst, (char*)src, (int)size);
-    }
-} /* CopyToArg */
-
-#else
 void _XtCopyFromArg(
     XtArgVal src,
     char* dst,
@@ -306,14 +227,13 @@ static void CopyToArg(
     }
 } /* CopyToArg */
 
-#endif
 
 static Cardinal CountTreeDepth(
     Widget w)
 {
     Cardinal count;
 
-    for (count = 1; w != NULL; w = (Widget) w->core.parent) 
+    for (count = 1; w != NULL; w = (Widget) w->core.parent)
 	count++;
 
     return count;
@@ -451,7 +371,7 @@ void _XtDependencies(
     new_res = (XrmResourceList *) __XtMalloc(new_num_res*sizeof(XrmResourceList));
     if (super_num_res > 0)
 	XtMemmove(new_res, super_res, super_num_res * sizeof(XrmResourceList));
-    
+
     /* Put pointers to class resource entries into new_res */
     new_next = super_num_res;
     for (i = 0; i < class_num_res; i++) {
@@ -529,7 +449,7 @@ void _XtConstraintResDependencies(
 
 
 
-    
+
 XrmResourceList* _XtCreateIndirectionTable (
     XtResourceList  resources,
     Cardinal	    num_resources)
@@ -639,11 +559,11 @@ static XtCacheRef *GetResources(
 	     i++, typed_arg++) {
 	    register XrmRepresentation argType;
 	    argName = quark_args[i];
-	    argType = (typed_arg->type == NULL) ? NULLQUARK 
+	    argType = (typed_arg->type == NULL) ? NULLQUARK
 		: XrmStringToRepresentation(typed_arg->type);
 	    if (argName == QinitialResourcesPersistent) {
 		persistent_resources = (Boolean)typed_arg->value;
-		found_persistence = True;   
+		found_persistence = True;
 		break;
 	    }
 	    for (j = 0, res = table; j < num_resources; j++, res++) {
@@ -659,7 +579,7 @@ static XtCacheRef *GetResources(
 		    }
 		    found[j] = TRUE;
 		    break;
-		}   
+		}
 	    }
 	}
     }
@@ -676,7 +596,7 @@ static XtCacheRef *GetResources(
 					      sizeof(XrmHashTable) *
 					      (searchListSize *= 2));
     }
-    
+
     if (persistent_resources)
 	cache_base = NULL;
     else
@@ -782,14 +702,14 @@ static XtCacheRef *GetResources(
 		register XtTypedArg* arg = typed_args + typed[j] - 1;
 
 		/*
-                 * This resource value has been specified as a typed arg and 
-		 * has to be converted. Typed arg conversions are done here 
+                 * This resource value has been specified as a typed arg and
+		 * has to be converted. Typed arg conversions are done here
 		 * to correctly interpose them with normal resource conversions.
                  */
 		XrmQuark	    from_type;
 		XrmValue            from_val, to_val;
 		Boolean		    converted;
-                 
+
 		from_type = StringToQuark(arg->type);
     		from_val.size = arg->size;
 		if ((from_type == QString) || ((unsigned) arg->size > sizeof(XtArgVal)))
@@ -927,22 +847,23 @@ static XtCacheRef *GetResources(
 		    }
 		}
 		UNLOCK_PROCESS;
-
-		if (typed[j]) {
-		    /*
-		     * This resource value was specified as a typed arg.
-		     * However, the default value is being used here since
-		     * type type conversion failed, so we compress the list.
-		     */
-		    register XtTypedArg* arg = typed_args + typed[j] - 1;
-		    register int i;
-
-		    for (i = num_typed_args - typed[j]; i; i--, arg++) {
-			*arg = *(arg+1);
-		    }
-		    num_typed_args--;
-		}
 	    } 
+	}
+	for (res = table, j = 0; j < num_resources; j++, res++) {
+	    if (!found[j] && typed[j]) {
+		/*
+		 * This resource value was specified as a typed arg.
+		 * However, the default value is being used here since
+		 * type type conversion failed, so we compress the list.
+		 */
+		register XtTypedArg* arg = typed_args + typed[j] - 1;
+		register int i;
+
+		for (i = num_typed_args - typed[j]; i > 0; i--, arg++) {
+		    *arg = *(arg+1);
+		}
+		num_typed_args--;
+	    }
 	}
 	if (tm_hack)
 	    widget->core.tm.current_state = NULL;
@@ -960,8 +881,10 @@ static XtCacheRef *GetResources(
 		if (cache_ptr && *cache_ptr)
 		    cache_ptr++;
 	    } else {
-		*((XtTranslations *)&widget->core.tm.current_state) =
-		    *((XtTranslations *)value.addr);
+		/* value.addr can be NULL see: !already_copied */
+		if (value.addr)
+		    *((XtTranslations *)&widget->core.tm.current_state) =
+			*((XtTranslations *)value.addr);
 	    }
 	}
     }
@@ -1043,7 +966,7 @@ XtCacheRef *_XtGetResources(
 
     /* Get names, classes for widget and ancestors */
     GetNamesAndClasses(w, names, classes);
-   
+
     /* Compile arg list into quarks */
     CacheArgs(args, num_args, typed_args, *num_typed_args, quark_cache,
 	      XtNumber(quark_cache), &quark_args);
@@ -1080,7 +1003,7 @@ void _XtGetSubresources (
     const char*   name,			/* name of subobject		    */
     const char*   class,		/* class of subobject		    */
     XtResourceList resources,		/* resource list for subobject    */
-    Cardinal	  num_resources,	                                    
+    Cardinal	  num_resources,
     ArgList	  args,			/* arg list to override resources */
     Cardinal	  num_args,
     XtTypedArgList typed_args,
@@ -1121,7 +1044,7 @@ void _XtGetSubresources (
     if (((int) resources->resource_offset) >= 0) {
 	XrmCompileResourceListEphem(resources, num_resources);
     }
-    table = _XtCreateIndirectionTable(resources, num_resources); 
+    table = _XtCreateIndirectionTable(resources, num_resources);
     Resrc = GetResources(w, (char*)base, names, classes, table, num_resources,
 			quark_args, args, num_args,
 			typed_args, &ntyped_args, False);
@@ -1139,7 +1062,7 @@ void XtGetSubresources (
     _Xconst char* name,			/* name of subobject		    */
     _Xconst char* class,		/* class of subobject		    */
     XtResourceList resources,		/* resource list for subobject    */
-    Cardinal	  num_resources,	                                    
+    Cardinal	  num_resources,
     ArgList	  args,			/* arg list to override resources */
     Cardinal	  num_args)
 {
@@ -1196,7 +1119,7 @@ void _XtGetApplicationResources (
     }
 
     /* Compile arg list into quarks */
-    CacheArgs(args, num_args, typed_args, num_typed_args,  quark_cache, 
+    CacheArgs(args, num_args, typed_args, num_typed_args,  quark_cache,
 	XtNumber(quark_cache), &quark_args);
     /* Compile resource list if needed */
     if (((int) resources->resource_offset) >= 0) {

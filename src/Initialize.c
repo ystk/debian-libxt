@@ -1,8 +1,26 @@
-/* $Xorg: Initialize.c,v 1.8 2001/02/09 02:03:55 xorgcvs Exp $ */
-
 /***********************************************************
-Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts
-Copyright 1993 by Sun Microsystems, Inc. Mountain View, CA.
+Copyright (c) 1993, Oracle and/or its affiliates. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next
+paragraph) shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
@@ -10,7 +28,7 @@ Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
 both that copyright notice and this permission notice appear in
-supporting documentation, and that the names of Digital or Sun not be
+supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
 software without specific, written prior permission.
 
@@ -22,17 +40,7 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
-SUN DISCLAIMS ALL WARRANTIES WITH REGARD TO  THIS  SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FIT-
-NESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL SUN BE  LI-
-ABLE  FOR  ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
-ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,  DATA  OR
-PROFITS,  WHETHER  IN  AN  ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION  WITH
-THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
 ******************************************************************/
-/* $XFree86: xc/lib/Xt/Initialize.c,v 3.21 2003/04/21 16:34:27 herrb Exp $ */
 
 /*
 
@@ -372,7 +380,7 @@ static void CombineAppUserDefaults(
     XrmDatabase *pdb)
 {
     char* filename;
-    char* path;
+    char* path = NULL;
     Boolean deallocate = False;
 
     if (!(path = getenv("XUSERFILESEARCHPATH"))) {
@@ -381,20 +389,14 @@ static void CombineAppUserDefaults(
 	char homedir[PATH_MAX];
 	GetRootDirName(homedir, PATH_MAX);
 	if (!(old_path = getenv("XAPPLRESDIR"))) {
-	    char *path_default = "%s/%%L/%%N%%C:%s/%%l/%%N%%C:%s/%%N%%C:%s/%%L/%%N:%s/%%l/%%N:%s/%%N";
-	    if (!(path =
-		  ALLOCATE_LOCAL(6*strlen(homedir) + strlen(path_default))))
-		_XtAllocError(NULL);
-	    sprintf( path, path_default,
-		    homedir, homedir, homedir, homedir, homedir, homedir );
+	    XtAsprintf(&path,
+		       "%s/%%L/%%N%%C:%s/%%l/%%N%%C:%s/%%N%%C:%s/%%L/%%N:%s/%%l/%%N:%s/%%N",
+		       homedir, homedir, homedir, homedir, homedir, homedir);
 	} else {
-	    char *path_default = "%s/%%L/%%N%%C:%s/%%l/%%N%%C:%s/%%N%%C:%s/%%N%%C:%s/%%L/%%N:%s/%%l/%%N:%s/%%N:%s/%%N";
-	    if (!(path =
-		  ALLOCATE_LOCAL( 6*strlen(old_path) + 2*strlen(homedir)
-				 + strlen(path_default))))
-		_XtAllocError(NULL);
-	    sprintf(path, path_default, old_path, old_path, old_path, homedir,
-		    old_path, old_path, old_path, homedir );
+	    XtAsprintf(&path,
+		       "%s/%%L/%%N%%C:%s/%%l/%%N%%C:%s/%%N%%C:%s/%%N%%C:%s/%%L/%%N:%s/%%l/%%N:%s/%%N:%s/%%N",
+		       old_path, old_path, old_path, homedir,
+		       old_path, old_path, old_path, homedir);
 	}
 	deallocate = True;
 #endif
@@ -406,7 +408,8 @@ static void CombineAppUserDefaults(
 	XtFree(filename);
     }
 
-    if (deallocate) DEALLOCATE_LOCAL(path);
+    if (deallocate)
+	XtFree(path);
 }
 
 static void CombineUserDefaults(
@@ -414,9 +417,9 @@ static void CombineUserDefaults(
     XrmDatabase *pdb)
 {
 #ifdef __MINGW32__
-    char *slashDotXdefaults = "/Xdefaults";
+    const char *slashDotXdefaults = "/Xdefaults";
 #else
-    char *slashDotXdefaults = "/.Xdefaults";
+    const char *slashDotXdefaults = "/.Xdefaults";
 #endif
     char *dpy_defaults = XResourceManagerString(dpy);
 
@@ -556,9 +559,9 @@ XrmDatabase XtScreenDatabase(
 	if (!(filename = getenv("XENVIRONMENT"))) {
 	    int len;
 #ifdef __MINGW32__
-	    char *slashDotXdefaultsDash = "/Xdefaults-";
+	    const char *slashDotXdefaultsDash = "/Xdefaults-";
 #else
-	    char *slashDotXdefaultsDash = "/.Xdefaults-";
+	    const char *slashDotXdefaultsDash = "/.Xdefaults-";
 #endif
 
 	    (void) GetRootDirName(filename = filenamebuf,
