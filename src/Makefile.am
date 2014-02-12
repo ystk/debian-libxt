@@ -77,16 +77,16 @@ libXt_la_LIBADD = @XT_LIBS@
 libXt_la_LDFLAGS = -version-number 6:0:0 -no-undefined
 
 #
-# The util directory contains a program that builds some of the sources. 
+# The util directory contains a program that builds some of the sources.
 # The input to this program is given in files. Unfortunately those input
 # files refers to things like
-# 
+#
 # 	util/foo
-# 
+#
 # so the generating program must be run from the top directory.
-# 
+#
 
-BUILT_SOURCE = StringDefs.c 
+BUILT_SOURCE = StringDefs.c
 BUILT_HEADER = $(top_builddir)/include/X11/StringDefs.h $(top_builddir)/include/X11/Shell.h
 BUILT_FILES = $(BUILT_SOURCE) $(BUILT_HEADER)
 
@@ -97,9 +97,9 @@ all-local: $(BUILT_FILES)
 $(BUILT_HEADER): $(BUILT_SOURCE)
 
 $(BUILT_SOURCE):
-	$(top_builddir)/util/makestrs -i $(top_srcdir) $(STRINGSABIOPTIONS) < $(STRING_LIST) > StringDefs.c
-	mkdir -p $(top_builddir)/src
-	mkdir -p $(top_builddir)/include/X11
-	cp StringDefs.h $(top_builddir)/include/X11
-	cp Shell.h $(top_builddir)/include/X11
-	rm StringDefs.h Shell.h
+	$(AM_V_GEN)$(top_builddir)/util/makestrs -i $(top_srcdir) $(STRINGSABIOPTIONS) < $(STRING_LIST) > StringDefs.c
+	$(AM_V_at)mkdir -p $(top_builddir)/src
+	$(AM_V_at)mkdir -p $(top_builddir)/include/X11
+	$(AM_V_at)cp StringDefs.h $(top_builddir)/include/X11
+	$(AM_V_at)cp Shell.h $(top_builddir)/include/X11
+	$(AM_V_at)rm StringDefs.h Shell.h

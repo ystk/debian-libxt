@@ -1,18 +1,36 @@
-/* $Xorg: Alloc.c,v 1.4 2001/02/09 02:03:53 xorgcvs Exp $ */
-
 /***********************************************************
-Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts,
-Copyright 1993 by Sun Microsystems, Inc. Mountain View, CA.
+Copyright (c) 1993, 2011, Oracle and/or its affiliates. All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice (including the next
+paragraph) shall be included in all copies or substantial portions of the
+Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+
+Copyright 1987, 1988 by Digital Equipment Corporation, Maynard, Massachusetts.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
-supporting documentation, and that the names of Digital or Sun not be
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of Digital not be
 used in advertising or publicity pertaining to distribution of the
-software without specific, written prior permission.  
+software without specific, written prior permission.
 
 DIGITAL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
 ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
@@ -21,15 +39,6 @@ ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
 WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
 ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
-
-SUN DISCLAIMS ALL WARRANTIES WITH REGARD TO  THIS  SOFTWARE,
-INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FIT-
-NESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL SUN BE  LI-
-ABLE  FOR  ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
-ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,  DATA  OR
-PROFITS,  WHETHER  IN  AN  ACTION OF CONTRACT, NEGLIGENCE OR
-OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION  WITH
-THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ******************************************************************/
 
@@ -58,7 +67,6 @@ used in advertising or otherwise to promote the sale, use or other dealings
 in this Software without prior written authorization from The Open Group.
 
 */
-/* $XFree86: xc/lib/Xt/Alloc.c,v 1.9 2001/12/14 19:56:07 dawes Exp $ */
 
 /*
  * X Toolkit Memory Allocation Routines
@@ -74,6 +82,8 @@ in this Software without prior written authorization from The Open Group.
 #undef _XBCOPYFUNC
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
 
 #define Xmalloc(size) malloc((size))
 #define Xrealloc(ptr, size) realloc((ptr), (size))
@@ -112,6 +122,43 @@ void _XtHeapInit(
     heap->start = NULL;
     heap->bytes_remaining = 0;
 }
+
+/* Version of asprintf() using XtMalloc
+ * Not currently available in XTTRACEMEMORY version, since that would
+ * require varargs macros everywhere, which are only standard in C99 & later.
+ */
+Cardinal XtAsprintf(
+    String *new_string,
+    _Xconst char * _X_RESTRICT_KYWD format,
+    ...)
+{
+    char buf[256];
+    Cardinal len;
+    va_list ap;
+
+    va_start(ap, format);
+    len = vsnprintf(buf, sizeof(buf), format, ap);
+    va_end(ap);
+
+    if (len < 0)
+	_XtAllocError("vsnprintf");
+
+    *new_string = XtMalloc(len + 1); /* snprintf doesn't count trailing '\0' */
+    if (len < sizeof(buf))
+    {
+	strncpy(*new_string, buf, len);
+	(*new_string)[len] = '\0';
+    }
+    else
+    {
+	va_start(ap, format);
+	if (vsnprintf(*new_string, len + 1, format, ap) < 0)
+	    _XtAllocError("vsnprintf");
+	va_end(ap);
+    }
+    return len;
+}
+
 
 #ifndef XTTRACEMEMORY
 
@@ -477,7 +524,7 @@ void _XtPrintMemory(char * filename)
 
     if (filename == NULL)
 	f = stderr;
-    else 
+    else
 	f = fopen(filename, "w");
     LOCK_PROCESS;
     fprintf(f, "total size: %d\n", ActiveXtMemory);

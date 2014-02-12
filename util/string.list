@@ -1,4 +1,3 @@
-! $Xorg: string.list,v 1.3 2000/08/17 19:46:22 cpqbld Exp $
 ! NOTE: To maintain binary compatibility, you can only APPEND items within
 !	a given list!!!!
 !
@@ -8,7 +7,7 @@
 #prefix Xt
 #feature XTSTRINGDEFINES
 #externref extern
-#externdef 
+#externdef
 ! note that the trailing space is required in the #externdef line.
 #ctmpl util/StrDefs.ct
 
