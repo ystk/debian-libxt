@@ -18,6 +18,7 @@ libxt_configure:
 		--with-appdefaultdir=/etc/X11/app-defaults \
 		--with-xfile-search-path="/usr/lib/X11/%L/%T/%N%S:/usr/lib/X11/%l/%T/%N%S:/usr/lib/X11/%T/%N%S:/etc/X11/%L/%T/%N%C%S:/etc/X11/%l/%T/%N%C%S:/etc/X11/%T/%N%C%S:/etc/X11/%L/%T/%N%S:/etc/X11/%l/%T/%N%S:/etc/X11/%T/%N%S" \
 		--enable-unit-tests \
+		--disable-silent-rules \
 		$(docflags) \
 		CFLAGS="$(CFLAGS)" \
 		LDFLAGS="$(LDFLAGS)"
